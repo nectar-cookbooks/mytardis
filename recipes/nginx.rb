@@ -2,7 +2,8 @@
 # Cookbook Name:: mytardis
 # Recipe:: nginx
 #
-# Copyright (c) 2012, The University of Queensland
+# Copyright (c) 2012, 2014, The University of Queensland
+# Copyright (c) 2012, 2013, The MyTardis Project
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,8 +27,6 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-include_recipe "iptables"
 
 if platform?("redhat","centos")
   remote_file "/var/tmp/nginx-repo.rpm" do

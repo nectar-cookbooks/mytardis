@@ -2,7 +2,8 @@
 # Cookbook Name:: mytardis
 # Recipe:: default
 #
-# Copyright (c) 2012, The University of Queensland
+# Copyright (c) 2012, 2014, The University of Queensland
+# Copyright (c) 2012, 2013, The MyTardis Project
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
