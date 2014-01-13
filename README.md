@@ -2,9 +2,12 @@ Overview
 ========
 *This cookbook is derived from Steve Androlakis's mytardis/mytardis-chef cookbook which is in turn based on Tim Dettrick's original work for UQ.*
 
-This version has been refactored to be Berkshelf-ready, and to remove some dubious fiddling with 'iptables'.
+This version has been refactored to be Berkshelf-ready, and modified to:
+* remove some dubious fiddling with 'iptables'.
 
-This Cookbook installs the current master of MyTardis - [http://github.com/mytardis/mytardis][1]
+(Future versions will include stuff to implement database backups and guard against damage caused by buggy South migrations.)
+
+By default, this Cookbook installs the current master of MyTardis - [http://github.com/mytardis/mytardis][1] - in "/opt/mytardis".  It also installs and configures an 'nginx' front-end webserver and a 'postgresql' database backend.
 
 Health Warning
 ==============
@@ -18,5 +21,18 @@ If you use this recipe for building a "production" MyTardis instance (i.e. one w
   * It is prudent to use a stable branch of MyTardis rather than 'master' some other development branch.  
   * Consider creating your own MyTardis fork and using that so that you don't get surprise redeployments.  (Especially if you are tracking 'master'.)
   * It is prudent to try out redeployments in a Test or UAT instance rather than redeploying straight into production.
+
+Prerequisites
+=============
+
+Ports 80 and 443 should be open.
+
+Attributes
+==========
+
+* `node['mytardis']['repo']` - This gives the URL of the MyTardis source Git repository to checkout and build from.  The 
+* `node['mytardis']['branch']` - This gives the branch (or tag) of the MyTardis repo to use.  It defaults to 'master'.
+
+If you deploy using Chef Solo, you also need to set `node['postgresql']['password']['postgres']` to a password for the database.
 
   [1]: http://github.com/mytardis/mytardis
