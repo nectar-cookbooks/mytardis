@@ -35,4 +35,11 @@ Attributes
 
 If you deploy using Chef Solo, you also need to set `node['postgresql']['password']['postgres']` to a password for the database.
 
+What next
+=========
+
+This recipe gives you a 'vanilla' MyTardis installation with no accounts.  Read the [MyTardis documentation site][2] for what you need to do next.  (The first thing is to create a "superuser" account ...)
+
+
   [1]: http://github.com/mytardis/mytardis
+  [2]: http://mytardis.readthedocs.org/en/latest/install.html
