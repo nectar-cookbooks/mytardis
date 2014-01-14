@@ -161,3 +161,4 @@ EOZ
   end
 end
 
+include_recipe "mytardis::logwatch"
