@@ -1,0 +1,41 @@
+#!/bin/env perl
+use strict;
+
+# Will hold pairs (error_type_string, count)
+my %ErrorTypeCount;
+my %WarningTypeCount;
+my $ThisLine;
+
+while (defined($ThisLine = <STDIN>)) {
+  if ($ThisLine =~ /\[.*ERROR.*\](.*)/oi) {
+    my $key = $1;
+    if (exists $ErrorTypeCount{$key}) {
+      $ErrorTypeCount{$key} += 1;
+    } else {
+      $ErrorTypeCount{$key} = 1;
+    }
+  } elsif ($ThisLine =~ /\[.*WARNING.*\](.*)/oi) {
+    my $key = $1;
+    if (exists $WarningTypeCount{$key}) {
+      $WarningTypeCount{$key} += 1;
+    } else {
+      $WarningTypeCount{$key} = 1;
+    }
+  }
+}
+
+# Print the total stats.
+my $TotalErrorCount = 0;
+my $TotalWarningCount = 0;
+print "\nERRORS\n";
+while (my ($type, $count) = each(%ErrorTypeCount)) {
+  print " * FOUND $count of $type\n";
+  $TotalErrorCount += $count;
+}
+print "\nWARNINGS\n";
+while (my ($type, $count) = each(%WarningTypeCount)) {
+  print " * FOUND $count of $type\n";
+  $TotalWarningCount += $count;
+}
+
+print "TOTAL $TotalErrorCount ERROR(s), $TotalWarningCount WARNING(s)\n";

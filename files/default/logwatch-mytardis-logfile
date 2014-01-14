@@ -1,0 +1,9 @@
+LogFile =
+Archive =
+LogFile = mytardis/tardis.log
+LogFile = mytardis/celerybeat-*.log
+LogFile = mytardis/celeryd-*.log
+Archive = mytardis/tardis.log.*.gz
+Archive = mytardis/celerybeat-*.log.*.gz
+Archive = mytardis/celeryd-*.log.*.gz
+*applymytardisdate

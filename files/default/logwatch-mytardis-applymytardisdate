@@ -1,0 +1,18 @@
+use Logwatch ':dates';
+
+$Debug = $ENV{'LOGWATCH_DEBUG'} || 0;
+
+$SearchDate = TimeFilter('%d/%b/%Y %H:%M:%S');
+$SearchDate2 = TimeFilter('%Y-%m-%d %H:%M:%S');
+
+if ( $Debug > 5 ) {
+   print STDERR "DEBUG: Inside ApplyDjangoDate...\n";
+   print STDERR "DEBUG: Looking For: " . $SearchDate . 
+                        " or " . $SearchDate2 . "\n";
+}
+
+while (defined($ThisLine = <STDIN>)) {
+   if ($ThisLine =~ m/\[$SearchDate/o || $ThisLine =~ m/\[$SearchDate2/o) {
+      print $ThisLine;
+   }
+}
