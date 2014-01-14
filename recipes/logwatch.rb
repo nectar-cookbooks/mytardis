@@ -35,6 +35,10 @@ if File.exists?("/etc/logwatch") then
     source "logwatch-mytardis-script"
     mode 0755
   end
+
+  directory "/etc/logwatch/scripts/shared" do
+    mode 0755
+  end  
   
   cookbook_file "/etc/logwatch/scripts/shared/applymytardisdate" do
     source "logwatch-mytardis-applymytardisdate"
