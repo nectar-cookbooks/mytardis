@@ -54,6 +54,11 @@ What next
 
 This recipe gives you a 'vanilla' MyTardis installation with no accounts.  Read the [MyTardis documentation site][2] for what you need to do next.  (The first thing is to create a "superuser" account ...)
 
+TO-DO List
+==========
+
+The main recipe relies on the Chef "deploy" resource.  It may be better to use the new "application" resource ... though that means switching from foreman to gunicorn.
+
 
   [1]: http://github.com/mytardis/mytardis
   [2]: http://mytardis.readthedocs.org/en/latest/install.html
