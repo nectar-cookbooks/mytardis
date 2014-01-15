@@ -36,6 +36,23 @@ include_recipe "mytardis::build-essential"
 include_recipe "mytardis::deps"
 include_recipe "mytardis::nginx"
 include_recipe "mytardis::postgresql"
+include_recipe "mytardis::logwatch"
+
+production = node["mytardis"]["production"]
+if node["mytardis"]["allow_migrations"] != nil then
+  allow_migrations = node["mytardis"]["allow_migrations"]
+else
+  allow_migrations = !production
+end
+if node["mytardis"]["backups"] != nil then
+  backups = node["mytardis"]["backups"]
+else
+  backups = production
+end
+
+if backups then
+  include_recipe "mytardis::backups"
+end
 
 ohai "reload_passwd" do
   action :nothing
@@ -130,12 +147,41 @@ deploy_revision "mytardis" do
       user "mytardis"
       cwd current_release
       code <<-EOH
-        # this egg-cache directory never gets created - hopfully not a problem.
-        export PYTHON_EGG_CACHE=/opt/mytardis/shared/egg-cache
         python setup.py clean
         find . -name '*.py[co]' -delete
         python bootstrap.py -c buildout-prod.cfg -v 1.7.0
         bin/buildout -c buildout-prod.cfg install
+
+      EOH
+    end
+    ruby_block "mytardis_migration_check" do
+      # The aim of this is to check to see if there are any
+      # potentially dangerous migrations to be performed.
+      block do
+        if !allow_migrations then
+          cmd = Chef::ShellOut.new(%Q[ bin/django migrate --list ],
+                                   :cwd => current_release,
+                                   :user => 'mytardis'
+                                   ).run_command
+          # Check the listing of migrations for any unapplied migration that
+          # is not an '0001' (initial) migration.  If we can't list the
+          # the migrations at all, we most likely have a brand new (empty)
+          # database.
+          if cmd.exitstatus == 0 and
+              cmd.stdout =~ /\( \) +(?!0001_initial)[^ ].*/ then
+            Chef::Application.fatal!(
+                                     "A potentially dangerous migration has been detected: #{$&}\n" +
+                                     "For advice on how to proceed, refer to the MyTardis Cookbook documentation\n")
+          end
+        end
+        resources(:bash => "mytardis_sync_and_collect").run_action(:run)
+      end
+    end
+    bash "mytardis_sync_and_collect" do
+      action :nothing
+      user "mytardis"
+      cwd current_release
+      code <<-EOH
         bin/django syncdb --noinput --migrate 
         bin/django collectstatic -l --noinput 
       EOH
@@ -161,4 +207,3 @@ EOZ
   end
 end
 
-include_recipe "mytardis::logwatch"
