@@ -15,8 +15,9 @@ Health Warning
 
 If you use this recipe for building a "production" MyTardis instance (i.e. one where the data matters), then you need to be aware of a couple of things:
 
- 1. This recipe does not set up backups of either the MyTardis database or the data store area weher data files are kept.  You need to make your own arrangements.
- 1. MyTardis uses South migration for managing database schema changes, and this recipe in its current form will apply any pending South migrations without any warning.  This ''should'' work, but there is always a risk that the migration will go wrong, and that you will be left with a corrupted database.  It is prudent to ''back up your database and data'' before you attempt to deploy a new version.
+ 1. This recipe does not set up backups of the directory data files are kept.  You need to make your own arrangements.
+
+ 1. MyTardis uses South migration for managing database schema changes, and this recipe in its current form will apply any pending South migrations without any warning.  This ''should'' work, but there is always a risk that the migration will go wrong, and that you will be left with a corrupted database.
 
  1. This recipe works by checking out and building MyTardis from a designated branch of a designated repository.  This can be risky.  For a production MyTardis instance:
   * It is prudent to use a stable branch of MyTardis rather than 'master' some other development branch.  
@@ -39,15 +40,34 @@ Attributes
 * `node['mytardis']['backups']` - If true, configure MyTardis backups.  This defaults to true in "production" mode and false otherwise.
 * `node['mytardis']['allow_migrations']` - If false, guard against potentially unsafe schema migrations.  This defaults to falsee in "production" mode and true otherwise.
 
-Schema Migrations
-=================
+South Migrations
+================
 
-TBD
+The MyTardis recipe blocks potentially dangerous South migrations in "production" mode or if "allow_migrations" is explicitly set to false.  (Potentially dangerous means any set of migrations that does not include the initial "0001" migration.)
+
+If an unsafe migration is detected, the deployment of the new version of MyTardis halts, and "/opt/mytardis/current" is not updated.  When this occurs, the following procedure is recommended.
+
+1. Look at the MyTardis commit and change logs to understand what the change involves, and decide whether you actually want to proceed.
+
+1. Take the MyTardis service offline by running "stop mytardis".
+
+1. Use the backup script to create an up-to-the-minute backup of the database.  (A data store backup is not generally necessary, though this depends on the nature of the migration being performed.)
+
+1. Modify the Chef node descriptor to set "allow_migrations" to true.
+
+1. Rerun the recipe using chef-client or chef-solo.
+
+1. Revert the above change to the Chef node descriptor.
+
+If something goes wrong with the migration, use the backup to restore the database to the pre-migration state.
+
 
 Backups
 =======
 
-TBD
+When MyTardis backups are enabled, a backup script is run nightly to create a snapshot of the MyTardis database tables.  These snapshots are saved in the "/var/lib/mytardis/backup" directory.
+
+At this time, we do not take backups of the files in the MyTardis data tree, and we do not take steps to copy the database backups to an off-machine location.
 
 What next
 =========
