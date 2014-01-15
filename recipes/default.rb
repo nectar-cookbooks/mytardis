@@ -184,15 +184,18 @@ deploy_revision "mytardis" do
           if cmd.exitstatus == 0 and
               cmd.stdout =~ /\( \) +(?!0001_initial)[^ ].*/ then
             Chef::Application.fatal!(
-                                     "A potentially dangerous migration has been detected: #{$&}\n" +
-                                     "For advice on how to proceed, refer to the MyTardis Cookbook documentation\n")
+                                     "A potentially dangerous South migration has been detected: #{$&}\n" +
+                                     "For advice on how to proceed, refer to the MyTardis chef cookbook documentation\n")
           end
         end
       end
     end
   end
   migration_command "bin/django syncdb --noinput --migrate &&" + 
-                    "bin/django collectstatic -l --noinput" 
+                    "bin/django collectstatic -l --noinput"
+
+  # The foreman restart needs to be run as root, so we can't use 
+  # the 'restart_command' attribute
   before_restart do
     current_release = release_path
 
