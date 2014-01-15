@@ -173,7 +173,7 @@ deploy_revision "mytardis" do
       block do
         # See if there are potentially dangerous migrations to be performed.
         if !allow_migrations then
-          cmd = MixLib::ShellOut.new(%Q[ bin/django migrate --list ],
+          cmd = Mixlib::ShellOut.new(%Q[ bin/django migrate --list ],
                                      :cwd => current_release,
                                      :user => 'mytardis'
                                      ).run_command
