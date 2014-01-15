@@ -137,7 +137,7 @@ deploy_revision "mytardis" do
   user "mytardis"
   group "mytardis"
   migrate true
-  symlink_before_migrate([])
+  symlink_before_migrate({})
   purge_before_symlink([])
   create_dirs_before_symlink([])
   symlinks({})
