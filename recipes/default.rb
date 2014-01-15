@@ -137,18 +137,28 @@ deploy_revision "mytardis" do
   user "mytardis"
   group "mytardis"
   migrate true
-  symlink_before_migrate(app_symlinks.merge({
-      "data" => "var",
-      "log" => "log",
-      "buildout.cfg" => "buildout-prod.cfg",
-      "settings.py" => "tardis/settings.py"
-  }))
+  symlink_before_migrate([])
   purge_before_symlink([])
   create_dirs_before_symlink([])
   symlinks({})
   before_migrate do
     current_release = release_path
 
+    # Create symlinks by hand ...
+    app_symlinks.merge({
+                         "data" => "var",
+                         "log" => "log",
+                         "buildout.cfg" => "buildout-prod.cfg",
+                         "settings.py" => "tardis/settings.py"}).each do |s, d|
+      src = "#{new_resource.shared_path}/#{s}"
+      dest = "#{release_path}/#{d}"
+      begin
+        FileUtils.ln_sf(src, dest)
+      rescue => e
+        raise Chef::Exceptions::FileNotFound.new("Cannot symlink #{src} to #{dest} before migrate: #{e.message}")
+      end
+    end
+    
     bash "mytardis_buildout_install" do
       user "mytardis"
       cwd current_release
