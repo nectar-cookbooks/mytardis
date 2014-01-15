@@ -3,9 +3,10 @@ Overview
 *This cookbook is derived from Steve Androlakis's mytardis/mytardis-chef cookbook which is in turn based on Tim Dettrick's original work for UQ.*
 
 This version has been refactored to be Berkshelf-ready, and modified to:
-* remove some dubious fiddling with 'iptables'.
-
-(Future versions will include stuff to implement database backups and guard against damage caused by buggy South migrations.)
+* remove some dubious fiddling with 'iptables',
+* implement backups (optional),
+* guard against potentially dangerous schema migrations (optional), and
+* implement MyTardis log watching (if logwatch is installed).
 
 By default, this Cookbook installs the current master of MyTardis - [http://github.com/mytardis/mytardis][1] - in "/opt/mytardis".  It also installs and configures an 'nginx' front-end webserver and a 'postgresql' database backend.
 
@@ -27,13 +28,26 @@ Prerequisites
 
 Ports 80 and 443 should be open.
 
+If you deploy using Chef Solo, you need to set `node['postgresql']['password']['postgres']` to a password for the database.  (By default, the "postgres" cookbook wants to persist a randomly generated password in a node attribute ... which only works in Chef Server mode.) 
+
 Attributes
 ==========
 
 * `node['mytardis']['repo']` - This gives the URL of the MyTardis source Git repository to checkout and build from.  The 
 * `node['mytardis']['branch']` - This gives the branch (or tag) of the MyTardis repo to use.  It defaults to 'master'.
+* `node['mytardis']['production']` - If true, install MyTardis as a "production" server.  This changes the defaults for certain other settings.  This flag defaults to false.
+* `node['mytardis']['backups']` - If true, configure MyTardis backups.  This defaults to true in "production" mode and false otherwise.
+* `node['mytardis']['allow_migrations']` - If false, guard against potentially unsafe schema migrations.  This defaults to falsee in "production" mode and true otherwise.
 
-If you deploy using Chef Solo, you also need to set `node['postgresql']['password']['postgres']` to a password for the database.
+Schema Migrations
+=================
+
+TBD
+
+Backups
+=======
+
+TBD
 
 What next
 =========
