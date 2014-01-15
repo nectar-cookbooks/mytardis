@@ -144,7 +144,7 @@ deploy_revision "mytardis" do
   before_migrate do
     current_release = release_path
 
-    # Create symlinks by hand ...
+    # Create symlinks by hand.  (Pre-migration symlink creation is too late.)
     app_symlinks.merge({
                          "data" => "var",
                          "log" => "log",
@@ -170,14 +170,13 @@ deploy_revision "mytardis" do
       EOH
     end
     ruby_block "mytardis_migration_check" do
-      # The aim of this is to check to see if there are any
-      # potentially dangerous migrations to be performed.
       block do
+        # See if there are potentially dangerous migrations to be performed.
         if !allow_migrations then
-          cmd = Chef::ShellOut.new(%Q[ bin/django migrate --list ],
-                                   :cwd => current_release,
-                                   :user => 'mytardis'
-                                   ).run_command
+          cmd = MixLib::ShellOut.new(%Q[ bin/django migrate --list ],
+                                     :cwd => current_release,
+                                     :user => 'mytardis'
+                                     ).run_command
           # Check the listing of migrations for any unapplied migration that
           # is not an '0001' (initial) migration.  If we can't list the
           # the migrations at all, we most likely have a brand new (empty)
@@ -197,7 +196,7 @@ deploy_revision "mytardis" do
   before_restart do
     current_release = release_path
 
-    bash "mytardis_foreman_install" do
+    bash "mytardis_foreman_install_and_restart" do
       cwd current_release
       code <<-EOH
         foreman export upstart /etc/init -a mytardis -p 3031 -u mytardis -l /var/log/mytardis
