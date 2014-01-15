@@ -109,6 +109,11 @@ template "/opt/mytardis/shared/settings.py" do
   group "mytardis"
 end
 
+##
+## FIXME ... hardwiring an old version of foreman means won't be able to
+## make use of foreman systemd support (for fedora) ... when it eventually
+## gets released.
+##
 bash "install foreman" do
   code <<-EOH
   # Version 0.48 removes 'log_root' variable
@@ -131,6 +136,7 @@ deploy_revision "mytardis" do
   branch node['mytardis']['branch']
   user "mytardis"
   group "mytardis"
+  migrate true
   symlink_before_migrate(app_symlinks.merge({
       "data" => "var",
       "log" => "log",
@@ -140,7 +146,7 @@ deploy_revision "mytardis" do
   purge_before_symlink([])
   create_dirs_before_symlink([])
   symlinks({})
-  before_symlink do
+  before_migrate do
     current_release = release_path
 
     bash "mytardis_buildout_install" do
@@ -151,7 +157,6 @@ deploy_revision "mytardis" do
         find . -name '*.py[co]' -delete
         python bootstrap.py -c buildout-prod.cfg -v 1.7.0
         bin/buildout -c buildout-prod.cfg install
-
       EOH
     end
     ruby_block "mytardis_migration_check" do
@@ -174,24 +179,17 @@ deploy_revision "mytardis" do
                                      "For advice on how to proceed, refer to the MyTardis Cookbook documentation\n")
           end
         end
-        resources(:bash => "mytardis_sync_and_collect").run_action(:run)
       end
     end
-    bash "mytardis_sync_and_collect" do
-      action :nothing
-      user "mytardis"
-      cwd current_release
-      code <<-EOH
-        bin/django syncdb --noinput --migrate 
-        bin/django collectstatic -l --noinput 
-      EOH
-    end
   end
-  restart_command do
+  migrate_command "cd #{current_release} ; " +
+                  "bin/django syncdb --noinput --migrate &&" + 
+                  "bin/django collectstatic -l --noinput" 
+  before_restart do
     current_release = release_path
 
-    bash "mytardis_foreman_install_and_restart" do
-      cwd "/opt/mytardis/current"
+    bash "mytardis_foreman_install" do
+      cwd current_release
       code <<-EOH
         foreman export upstart /etc/init -a mytardis -p 3031 -u mytardis -l /var/log/mytardis
         cat >> /etc/init/mytardis-uwsgi-1.conf <<EOZ
@@ -201,9 +199,8 @@ post-stop script
   pkill -9 uwsgi
 end script
 EOZ
-        restart mytardis || start mytardis
       EOH
     end
   end
+  restart_command "restart mytardis || start mytardis"
 end
-
