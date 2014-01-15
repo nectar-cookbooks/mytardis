@@ -31,4 +31,30 @@
 # Configure MyTardis backups and backup jobs.
 #
 
-# TBD
+directory "/var/lib/mytardis/backup" do
+  owner "mytardis"
+  group "mytardis"
+end
+
+#
+# MyTardis database backups.
+#
+cookbook_file "/opt/mytardis/shared/backupdb.sh" do
+  action :create
+  source "backupdb.sh"
+  owner "mytardis"
+  group "mytardis"
+  mode "0750"
+end
+
+cron "mytardis_db_backup" do
+  command "/opt/mytardis/shared/backupdb.sh --purgeOld"
+  hour "18"
+  minute "0"
+  user "mytardis"
+  mailto "root"
+  action :create
+end
+
+# Datafile backups to be implemented.
+

@@ -50,10 +50,6 @@ else
   backups = production
 end
 
-if backups then
-  include_recipe "mytardis::backups"
-end
-
 ohai "reload_passwd" do
   action :nothing
   plugin "passwd"
@@ -215,3 +211,8 @@ EOZ
     end
   end
 end
+
+if backups then
+  include_recipe "mytardis::backups"
+end
+
