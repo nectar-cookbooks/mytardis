@@ -182,7 +182,7 @@ deploy_revision "mytardis" do
       end
     end
   end
-  migrate_command "cd #{current_release} ; " +
+  migrate_command "cd #{release_path} ; " +
                   "bin/django syncdb --noinput --migrate &&" + 
                   "bin/django collectstatic -l --noinput" 
   before_restart do
