@@ -4,9 +4,10 @@ Overview
 
 This version has been refactored to be Berkshelf-ready, and modified to:
 * remove some dubious fiddling with 'iptables',
-* implement backups (optional),
+* implement MyTardis database backups (optional),
 * guard against potentially dangerous schema migrations (optional), and
-* implement MyTardis log watching (if logwatch is installed).
+* implement MyTardis log watching and log rotation (if the corresponding
+  admin tools are installed).
 
 By default, this Cookbook installs the current master of MyTardis - [http://github.com/mytardis/mytardis][1] - in "/opt/mytardis".  It also installs and configures an 'nginx' front-end webserver and a 'postgresql' database backend.
 

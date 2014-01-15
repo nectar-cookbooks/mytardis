@@ -37,6 +37,7 @@ include_recipe "mytardis::deps"
 include_recipe "mytardis::nginx"
 include_recipe "mytardis::postgresql"
 include_recipe "mytardis::logwatch"
+include_recipe "mytardis::logrotate"
 
 production = node["mytardis"]["production"]
 if node["mytardis"]["allow_migrations"] != nil then
