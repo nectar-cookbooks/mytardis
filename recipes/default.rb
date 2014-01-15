@@ -208,8 +208,8 @@ post-stop script
   pkill -9 uwsgi
 end script
 EOZ
+        restart mytardis || start mytardis
       EOH
     end
   end
-  restart_command "restart mytardis || start mytardis"
 end
